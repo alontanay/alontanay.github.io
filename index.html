@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/5ed507ef8aa53d8ecfea96d96bc7214cd2476fd2/FileSaver.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="page_style.css">
+</head>
+<!-- body: -->
+<body>
+    <script>
+        let loading_left = 4
+        function loaded() {loading_left--}
+    </script>
+    <div style="display: none;">
+        <img id="arrow_img" src="arrow.png" onload="loaded()">
+        <img id="negative_img" src="negative.png" onload="loaded()">
+        <img id="positive_img" src="positive.png" onload="loaded()">
+        <img id="trash_img" src="trash.png" onload="loaded()">
+    </div>
+    <div id="main_div" style="display: block;">
+        <h1>Charges Simulator - By Alon Tanay</h1>
+        <canvas style="cursor: grab"  ondrop="dropHandler(event);" ondragover="dragOverHandler(event);"  id="screen"><!--Hi, your browser does not support html5 canvas... update your browser or get a decent one like <link href="https://www.mozilla.org/en-US/firefox/new/">firefox</link>--></canvas>
+        <p>remember to put your browser window in full screen, otherwise bugs may occur</p>
+    </div>
+    <div id="upload_div" style="display: none;">
+        <h1 id="file_title">Upload your solution to here:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Upload your challange to here:</h1>
+        <div class="center">
+            <!-- solution -->
+            <input id="solution_file_button" type="button" value="click here to browse for files
+            or drag yours from your file explorer and drop it in this box" style="word-break:keep-all;font-family:'Times New Roman', Times, serif;border:3px solid black;font-size:20px;align-self:center;width:600px;height:300px" onclick="upload_file()" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" />
+            <input id="file_uploader" type="file" style="display: none;" accept="text/*" name="file"/>
+            <div style="width:20px"></div>
+            <!-- obstacle field -->
+            <input id="challange_file_button" type="button" value="click here to browse for files
+            or drag yours from your file explorer and drop it in this box" style="word-break:keep-all;font-family:'Times New Roman', Times, serif;border:3px solid black;font-size:20px;align-self:center;width:600px;height:300px" onclick="upload_file('challange')" ondrop="dropHandler(event, 'challange');" ondragover="dragOverHandler(event);" />>
+        </div>
+        <div style="height: 20px;"></div>
+        <div class="center">
+            <button id="cancel_button" onclick="switch_divs()" style="height:40px;width:100px;font-size:large;font-weight:bold;">cancel</button>
+        </div>
+
+        <p id="file_info">you can only upload .txt files that have been created in this website
+        <br>files from the wrong format will not be processed</p>
+    </div>
+
+    <script> 
+        let curr_loaded_sol = -1
+        let main_div = document.getElementById('main_div')
+        let upload_div = document.getElementById('upload_div')
+        /*function getScroll() { 
+            if (window.pageYOffset != undefined) { 
+                return pageYOffset
+            } else { 
+                let y_axis, doc = document, 
+                    ele = doc.documentElement, 
+                    b = doc.body
+                y_axis = ele.scrollTop || b.scrollTop || 0; 
+                return y_axis 
+            } 
+        } */
+        
+        let solution_file_uploader = document.getElementById('solution_file_uploader')
+        
+        let input_file_type = 'none yet lol'
+
+        file_uploader.addEventListener('change', function() {
+            reader.readAsText(file_uploader.files[0])
+            reader.onload = function() {
+                // switch_divs()
+                console.log('ONCHANGE:\n' + reader.result)
+                request_confirmation(load)
+            }
+        })
+
+        let reader = new FileReader()
+        
+        function upload_file(type) {
+            input_file_type = type
+            file_uploader.click()
+            switch_divs()
+        }
+
+        function dragOverHandler(ev) {
+            ev.preventDefault()
+        }
+        
+        function dropHandler(ev, type='solution') {
+            input_file_type = type
+            ev.preventDefault()
+
+            if (ev.dataTransfer.items) {
+                let input = ev.dataTransfer.items[0]
+                if (input.kind === 'file') {
+                    if(!input.type.match(/text.*/)){
+                        document.getElementById('upload_title').innerHTML += ' (Only Text files!)'
+                    }
+                    input = input.getAsFile()
+                    reader.readAsText(input)
+                    reader.onload = function() {
+                        switch_divs()
+                        console.log('ONDROP:\n' + reader.result)
+                        request_confirmation(load)
+                    }
+                    
+                }
+                
+            }
+        }
+        $('canvas').bind('contextmenu', function(e){
+            return false;
+        }); 
+    </script>
+    <script src="page_script.js"></script>
+    </body>
+</html>

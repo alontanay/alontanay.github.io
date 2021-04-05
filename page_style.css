@@ -1,0 +1,23 @@
+html {
+    scroll-behavior:auto;
+}
+
+#screen {
+    border: 5px solid black;
+    margin: auto;
+    display: block;
+}
+
+h1 {
+    text-align: center;
+}
+
+p {
+    text-align: center;
+    font-size: large;
+}
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
