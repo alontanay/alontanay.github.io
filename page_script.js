@@ -1,3 +1,4 @@
+// main code for running the html page
 class Text {
     constructor(text, font, pos, style='black') {
         this.text = text
