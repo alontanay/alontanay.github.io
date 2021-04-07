@@ -309,10 +309,7 @@ const deadly_walls = false
 const force_const = 200
 const max_force_const = 0.001
 const min_f_size = 30
-let charges = [
-    new Charge(50,199, 1),
-    new Charge(800,400, -1)
-]
+let charges = []
 let draggedCharge = {
     'sign': 0,
     'index': -1
