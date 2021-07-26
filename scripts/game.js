@@ -29,6 +29,12 @@ class Vec2 {
     sizeSq() {
         return (this.x * this.x + this.y * this.y);
     }
+    distSqTo(vec) {
+        return ((this.x-vec.x) * (this.x-vec.x) + (this.y-vec.y) * (this.y-vec.y));
+    }
+    toArray() {
+        return [this.x, this.y];
+    }
 };
 
 
