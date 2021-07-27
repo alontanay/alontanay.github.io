@@ -38,6 +38,104 @@ class Vec2 {
 };
 
 
+function posInRect(pos,rect) {
+    return (rect[0] < pos[0] && pos[0] < rect[0] + rect[2] && rect[1] < pos[1] && pos[1] < rect[1] + rect[3]);
+}
+function addVec(v1, v2) {
+    return [v1[0]+v2[0],v1[1]+v2[1]];
+}
+function subVec(v1, v2) {
+    return [v1[0]-v2[0],v1[1]-v2[1]];
+}
+function mulVec(l,v) {
+    return [l*v[0], l*v[1]];
+}
+function size(v) {
+    return Math.sqrt(v[0]*v[0]+v[1]*v[1]);
+}
+function dirVec(v) {
+    return resizeVec(1,v);
+}
+function resizeVec(l, v) {
+    return mulVec(l/size(v),v);
+}
+
+function lineIntersectRect(line, rect) {
+    let [x,y,w,h] = rect;
+    let [a,b] = line;
+
+
+    if(a[0] == b[0]) {
+        return ((x < a[0]) && (a[0] < x + w) && ((a[1] < y && b[1] > y + h) || (b[1] < y && a[1] > y + h)));
+    }
+    if(a[1] == b[1]) {
+        return ((y < a[1]) && (a[1] < y + h) && ((a[0] < x && b[0] > x + w) || (b[0] < x && a[0] > x + w)));
+    }
+    // if obviously not intersecting:
+    if(x > Math.max(a[0],b[0])) {
+        return false;
+    }
+    if(x+w < Math.min(a[0],b[0])) {
+        return false;
+    }
+    if(y > Math.max(a[1],b[1])) {
+        return false;
+    }
+    if(y+h < Math.min(a[1],b[1])) {
+        return false;
+    }
+    leftY = yAt(line, x);
+    rightY = yAt(line, x + w);
+    upperX = xAt(line, y);
+    lowerX = xAt(line, y + h);
+    return (((y < leftY) && (leftY < y + h)) || ((y < rightY) && (rightY < y + h)) || ((x < upperX) && (upperX < x + w)) || ((x < lowerX) && (lowerX < x + w)));
+}
+function circleIntersectRect(circle, rect) {
+    let [x, y, r] = circle;
+    let [rx, ry, rw, rh] = rect;
+    
+    if(ry < y && y < ry + rh) {
+        if(Math.abs(x-rx) < r) {
+            return true;
+        }
+        if(Math.abs(x-rx-rw) < r) {
+            return true;
+        }
+        return false;
+    }
+
+    if(rx < x && x < rx + rw) {
+        if(Math.abs(y-ry) < player_radius) {
+            return true;
+        }
+        if(Math.abs(y-ry-rh) < player_radius) {
+            return true;
+        }
+        return false;
+    }
+
+    if(size(x-rx, y-ry) < player_radius || size(x-rx-rw, y-ry) < player_radius || size(x-rx-rw, y-ry-rh) < player_radius || size(x-rx, y-ry-rh) < player_radius) {
+        return true;
+    }
+    return false;
+}
+
+function yAt(line, x) {
+    let [a, b] = line;
+    return a[1] + (b[1] - a[1])/(b[0]-a[0])*(x-a[0]);
+}
+function xAt(line, y) {
+    let [a, b] = line;
+    return a[0] + (b[0]-a[0])/([b[1]-a[1]])*(y-a[1]);
+}
+
+
+function isDigit(c) { 
+    return /\d/.test(c); 
+}
+
+
+
 function drawRotated(image, x, y, degrees){
     screen.save();
     screen.translate(x,y);
@@ -114,100 +212,4 @@ function drawCircle(x,y,r,fillColor, strokeColor, lineWidth) {
     screen.arc(x, y, r, 0, 2 * Math.PI)
     screen.stroke()
     screen.fill()
-}
-
-function pos_in_rect(pos,rect) {
-    return (rect[0] < pos[0] && pos[0] < rect[0] + rect[2] && rect[1] < pos[1] && pos[1] < rect[1] + rect[3])
-}
-function add_vec(v1, v2) {
-    return [v1[0]+v2[0],v1[1]+v2[1]]
-}
-function sub_vec(v1, v2) {
-    return [v1[0]-v2[0],v1[1]-v2[1]]
-}
-function mul_vec(l,v) {
-    return [l*v[0], l*v[1]]
-}
-function size(v) {
-    return Math.sqrt(v[0]*v[0]+v[1]*v[1])
-}
-function dir_vec(v) {
-    return resize_vec(1,v)
-}
-function resize_vec(l, v) {
-    return mul_vec(l/size(v),v)
-}
-
-function line_intersect_rect(line, rect) {
-    let [x,y,w,h] = rect
-    let [a,b] = line
-
-
-    if(a[0] == b[0]) {
-        return ((x < a[0]) && (a[0] < x + w) && ((a[1] < y && b[1] > y + h) || (b[1] < y && a[1] > y + h)))
-    }
-    if(a[1] == b[1]) {
-        return ((y < a[1]) && (a[1] < y + h) && ((a[0] < x && b[0] > x + w) || (b[0] < x && a[0] > x + w)))
-    }
-    // if obviously not intersecting:
-    if(x > Math.max(a[0],b[0])) {
-        return false
-    }
-    if(x+w < Math.min(a[0],b[0])) {
-        return false
-    }
-    if(y > Math.max(a[1],b[1])) {
-        return false 
-    }
-    if(y+h < Math.min(a[1],b[1])) {
-        return false
-    }
-    left_y = y_at(line, x)
-    right_y = y_at(line, x + w)
-    upper_x = x_at(line, y)
-    lower_x = x_at(line, y + h)
-    return (((y < left_y) && (left_y < y + h)) || ((y < right_y) && (right_y < y + h)) || ((x < upper_x) && (upper_x < x + w)) || ((x < lower_x) && (lower_x < x + w)))
-}
-function circle_intersect_rect(circle, rect) {
-    let [x, y, r] = circle
-    let [rx, ry, rw, rh] = rect
-    
-    if(ry < y && y < ry + rh) {
-        if(Math.abs(x-rx) < r) {
-            return true
-        }
-        if(Math.abs(x-rx-rw) < r) {
-            return true
-        }
-        return false
-    }
-
-    if(rx < x && x < rx + rw) {
-        if(Math.abs(y-ry) < player_radius) {
-            return true
-        }
-        if(Math.abs(y-ry-rh) < player_radius) {
-            return true
-        }
-        return false
-    }
-
-    if(size(x-rx, y-ry) < player_radius || size(x-rx-rw, y-ry) < player_radius || size(x-rx-rw, y-ry-rh) < player_radius || size(x-rx, y-ry-rh) < player_radius) {
-        return true
-    }
-    return false
-}
-
-function y_at(line, x) {
-    let [a, b] = line
-    return a[1] + (b[1] - a[1])/(b[0]-a[0])*(x-a[0]) 
-}
-function x_at(line, y) {
-    let [a, b] = line
-    return a[0] + (b[0]-a[0])/([b[1]-a[1]])*(y-a[1])
-}
-
-
-function is_digit(c) { 
-    return /\d/.test(c); 
 }
