@@ -17,11 +17,13 @@
             if(isNaN(rowInput) || isNaN(parseInt(rowInput)) || isNaN(colInput) || isNaN(parseInt(colInput))) {
                 return;
             }
-            rows = parseInt(rowInput);
-            cols = parseInt(colInput);
-            if(Math.min(rows,cols) < 2 || Math.max(rows,cols) > 10) {
+            rowInput = parseInt(rowInput);
+            colInput = parseInt(colInput);
+            if(Math.min(rowInput,colInput) < 2 || Math.max(rowInput,colInput) > 10) {
                 return;
             }
+            rows = rowInput;
+            cols = colInput;
             blockSize = Math.min(Math.floor(600 / rows), Math.floor(1200 / cols));
             canvas.width = cols * blockSize;
             canvas.height = rows * blockSize;
