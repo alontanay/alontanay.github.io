@@ -1,2 +1,1 @@
-# An extremely poorly written physics simulator
-atleast you can't go through walls in this one...
+# he he
