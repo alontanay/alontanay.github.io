@@ -1,0 +1,82 @@
+#header {
+    position: absolute;
+    top:0px;
+    left:0px;
+    right:0px;
+    border-top: 5px solid black;
+    border-bottom: 5px solid black;
+    height: 100px;
+    width: 100%;
+    background-color: #e0d7c0;
+}
+.title, .subtitle{
+    text-align: center;
+}
+.category {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.category-title {
+    font-family: verdana, sans-serif;
+    font-size: 25px;
+    font-weight: bold;
+    margin: 0px;
+    left: 5px;
+}
+.link-row {
+    /* align-items: center; */
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 4px;
+    justify-content: center;
+    top: 0px;
+    overflow-x: hidden;
+}
+
+.link {
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    position: relative;
+}
+.link:hover .overlay {
+    opacity: 0.25;
+}
+.overlay {
+    position: absolute;
+    top: 4px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    bottom: 4px;
+    width: 100%;
+    opacity: 0;
+    transition: .2s ease;
+    background-color: #888888;
+}
+.link-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 123px;
+    border: 3px solid black;
+}
+.link-img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.link-txt {
+    width: 200px;
+    height: 38px;
+    border: 3px solid black;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+
+}
