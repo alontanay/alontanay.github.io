@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Blister Effect</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1>Shadow Blister Effect</h1>
+    <h2>- Alon Tanay</h2>
+    <canvas id="canvas"></canvas>
+    <div class="buttons">
+        <button onclick="upper.x -= 50; if(upper.x < 400) { upper.x = 400; }">Move Left</button>
+        <button onclick="upper.x += 50; if(upper.x > 700) { upper.x = 700; }">Move Right</button>
+        <button onclick="source.y1 += 50; source.y2 -= 50; if(source.y1 > 250) { source.y1 = 250; source.y2 = 350; }">Decrease Source</button>
+        <button onclick="source.y1 -= 50; source.y2 += 50; if(source.y1 < 100) { source.y1 = 100; source.y2 = 500; }">Increase Source</button>
+    </div>
+    <div id="toggles">
+    <input type="range" min="1" max="100" value="25" id="speed">
+    <span style='display:block;margin:auto;width:fit-content' class="toggle-label">Simulation speed</span><br>
+    
+    <!-- <label class="switch">
+        <input type="checkbox" id="vis-shadows-separately">
+        <span class="slider round"></span>
+    </label>
+    <span class="toggle-label">Show the shadows seperately</span><br>
+     -->
+    <label class="switch">
+        <input type="checkbox" id="vis-shadow-ranges">
+        <span class="slider round"></span>
+    </label>
+    <span class="toggle-label">Show seperation of shadow into full shadow and partial shadow (Upper blue; Lower green)</span><br>
+    
+    <label class="switch">
+        <input type="checkbox" id="vis-mid-shadow">
+        <span class="slider round"></span>
+    </label>
+    <span class="toggle-label">Show shadow line on furthur object (Green)</span><br>
+
+    <label class="switch">
+        <input type="checkbox" id="vis-blister-range">
+        <span class="slider round"></span>
+    </label>
+    <span class="toggle-label">Show range of blister (Red)</span><br>
+
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
