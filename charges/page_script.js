@@ -969,7 +969,7 @@ function help() {
         ['Commands:', '25px Arial', '#000000', 170, 190],
         ['Start: starts simulation', '20px Arial', '#000000', 170, 230],
         ['Stop: resets the simulation and keeps the charges setup', '20px Arial', '#000000', 170, 270],
-        ['Clear: clears all proggress and charges from the board', '20px Arial', '#000000', 170, 310],
+        ['Clear: clears all progress and charges from the board', '20px Arial', '#000000', 170, 310],
         ['Save: saves your solution (downloadable)', '20px Arial', '#000000', 170, 350],
         ['Load: opens an existing solution from your computer', '20px Arial', '#000000', 170, 390],
         ['Leader Board: shows current leader board', '20px Arial', '#000000', 170, 430]
