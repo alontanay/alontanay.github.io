@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equation Balancer</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <h1>Balance!</h1>
+  <div id="sim-body">
+  <table id="eq-input-table" class="eq">
+    <tr>
+      <th><input id="eq-input-left" class="eq-input-side" placeholder="Write expression here..." value="H2 + O2"></th>
+      <th><svg width="80" height="40" viewBox="0 0 200 100">
+          <path fill="#DDDDFF" stroke="black" stroke-width="7.5" d="
+      M5 30
+      L145 30
+      L145 0
+      L195 50
+      L145 100
+      L145 70
+      L5 70
+      Z
+      ">
+        </svg></th>
+      <th><input id="eq-input-right" class="eq-input-side" placeholder="Write expression here..." value="H2O"></th>
+    </tr>
+  </table>
+  <p id="eq-error" class="eq"></p>
+  <div id="eq-display" class="eq">
+    <span>A<sub>3</sub>B</span>
+  </div>
+  <div id="balanced-section" class="eq">
+    <p>balanced:</p>
+    <div id="eq-balanced"></div>
+  </div>
+  <p id="footer">
+    Still didn't implement parenthesis for the chemical expressions, maybe later, maybe never
+    <br><br><br>
+    I won't even try to avoid non-positive coefficients when balancing. I guess some kind of randomization / bruteforcing would work for most small examples, but for the general case integer linear programming doesn't seem very nice</p>
+  </div>
+  <script src="linear-equation-solver.js"></script>
+  <script src="chemistry.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
