@@ -70,10 +70,15 @@ h1 {
     left: 0;
     right: 0;
     text-align: center;
-    width:80%;
+    width: 80%;
     bottom: 0;
 }
 
 .mol-coef {
-    color: rgb(255, 94, 201);
+    color: #DD8484;
+}
+
+sub,
+.deep-mol-coef {
+    color: #8484DD;
 }

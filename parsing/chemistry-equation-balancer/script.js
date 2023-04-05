@@ -19,14 +19,12 @@ inputRight.onchange = () => {
 }
 
 for (let eqSide of document.getElementsByClassName('eq-input-side')) {
-    console.log(eqSide);
     eqSide.oninput = eqSide.onkeypress = eqSide.onpaste = (event) => { eqSide.onchange(event); }
 }
 
 function updateEquation() {
     let exprLeft = parserLeft.run(inputLeft.value);
     let exprRight = parserRight.run(inputRight.value);
-    console.log(exprLeft + ' ' + exprRight);
     errorDiv.style.display = displayDiv.style.display = balancedSection.style.display = 'none';
 
     let badInput = null;

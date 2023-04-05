@@ -1,5 +1,5 @@
 Array.prototype.top = function () {
-    return this[this.length];
+    return this[this.length - 1];
 }
 
 const ELEMENTS = {
@@ -128,19 +128,34 @@ function is_digit(char) {
     return /\d/.test(char);
 }
 
-class Homonuclear {
-    constructor(el = '', cnt = 1) {
+class ElementType {
+    constructor(el = '') {
         this.el = el;
+    }
+    toString() { return this.el; }
+    toHTML() { return this.el; }
+    countEls() { let res = {}; res[this.el] = 1; return res; }
+}
+
+class MoleculePart {
+    constructor(val, cnt = 1) {
+        this.val = val;
+        if (val instanceof String || typeof val === 'string') {
+            this.val = new ElementType(val);
+        }
         this.cnt = cnt;
     }
     toString() {
-        return this.el + (this.cnt == 1 ? '' : String(this.cnt));
+        return ((this.val instanceof ElementType) ? String(this.val) : `(${String(this.val)})`) + (this.cnt == 1 ? '' : String(this.cnt));
     }
-    toHTML() {
-        return this.el + (this.cnt == 1 ? '' : '<sub>' + String(this.cnt) + '</sub>');
+    toHTML(deep = false) {
+        return ((this.val instanceof ElementType) ? this.val.toHTML(deep) : `(${this.val.toHTML(deep)})`) + (this.cnt == 1 ? '' : `<sub>${this.cnt}</sub>`);
     }
     countEls() {
-        let res = {}; res[this.el] = this.cnt;
+        let res = this.val.countEls();
+        for (let el in res) {
+            res[el] *= this.cnt;
+        }
         return res;
     }
 }
@@ -154,22 +169,23 @@ class Molecule {
         this.parts.push(comp);
     }
     toString() {
+        if (this.parts.length == 0) { return '()'; }
         let res = (this.coef == 1 ? '' : String(this.coef)) + '(';
         for (let part of this.parts) {
             res += part.toString() + ' ';
         }
         return res.slice(0, -1) + ')';
     }
-    toHTML() {
-        let res = (this.coef == 1 ? '' : '<span class="mol-coef">' + String(this.coef) + '</span>');
+    toHTML(deep = false) {
+        let res = this.coef == 1 ? '' : `<span class="${deep ? 'deep-':''}mol-coef">${this.coef}</span>`;
         for (let part of this.parts) {
-            res += part.toHTML();
+            res += part.toHTML(true);
         }
         return res;
     }
     countEls() {
         let res = {};
-        for(let part of this.parts) {
+        for (let part of this.parts) {
             let histo = part.countEls();
             for (const [el, cnt] of Object.entries(histo)) {
                 if (!(el in res)) {
@@ -218,7 +234,6 @@ function get_next(automata, c) {
     } else {
         move = c;
     }
-    console.log('   move', move);
     return (move in automata ? automata[move] : -1);
 }
 
@@ -227,8 +242,11 @@ const parsingErrorMessages = new Map([
     [-1, 'Unexpected Symbol'],
     [-2, 'invalid start to element\ name, must start with upper-case character'],
     [-3, 'invalid element name, can\'t have more than one lower-case character'],
-    [-4, 'expected molecule before next \'+\' or end of expression'],
-    [-5, 'molecule isn\'t complete, only a number']
+    [-4, 'expected molecule before \'+\' or end of expression'],
+    [-5, 'molecule isn\'t complete, only a number'],
+    [-6, 'unmatched parentheses'],
+    [-7, 'unclosed parentheses at end of molecule'],
+    [-8, 'parentheses must contain at least one molecule or inner parentheses']
 ]);
 
 class ParsingError {
@@ -246,30 +264,36 @@ class Parser {
         let self = this;
         this.automata = {
             0: {
-                call: (c) => { self.mol = new Molecule(); self.expr = new Expression(); },
+                call: (c) => { self.mols = [new Molecule()]; self.expr = new Expression(); },
 
                 'upper': 1,
                 'digit': 6,
                 'lower': -2,
-                '+': -4
+                '+': -4,
+                '(': 9,
+                ')': -6
             }, // before expression
 
             1: {
-                call: (c) => { self.comp = new Homonuclear(c); },
+                call: (c) => { self.comp = new MoleculePart(c); },
 
                 'lower': 2,
                 'upper': 8,
                 'digit': 3,
-                '+': 5
+                '+': 5,
+                '(': 10,
+                ')': 11
             }, // first letter of first element
 
             2: {
-                call: (c) => { self.comp.el += c; },
+                call: (c) => { self.comp.val.el += c; },
 
                 'lower': -3,
                 'upper': 8,
                 'digit': 3,
-                '+': 5
+                '+': 5,
+                '(': 10,
+                ')': 11
             }, // second letter of element
 
             3: {
@@ -278,7 +302,9 @@ class Parser {
                 'lower': -2,
                 'upper': 8,
                 'digit': 4,
-                '+': 5
+                '+': 5,
+                '(': 10,
+                ')': 11
             }, // first digit in number after element
 
             4: {
@@ -290,54 +316,107 @@ class Parser {
                 'lower': -2,
                 'upper': 8,
                 'digit': 4,
-                '+': 5
-
+                '+': 5,
+                '(': 10,
+                ')': 11
             }, // non-first digit in number after element
 
             5: {
                 call: (c) => {
-                    self.mol.add(self.comp);
-                    self.expr.add(self.mol);
-                    self.mol = new Molecule();
+                    if (self.mols.length != 1) {
+                        return -7;
+                    }
+                    self.mols.top().add(self.comp);
+                    self.expr.add(self.mols.top());
+                    self.mols = [new Molecule()];
                 },
 
                 'lower': -2,
                 'upper': 1,
                 'digit': 6,
-                '+': -4
+                '+': -4,
+                '(': 9,
+                ')': -6
             }, // + after element and number
 
             6: {
-                call: (c) => { self.mol.coef = c - '0'; },
+                call: (c) => { self.mols.top().coef = c - '0'; },
 
                 'lower': -2,
                 'digit': 7,
                 'upper': 1,
-                '+': -5
+                '+': -5,
+                '(': 9,
+                ')': -8
             }, // first digit in number before molecule
 
             7: {
                 call: (c) => {
-                    self.mol.coef *= 10;
-                    self.mol.coef += c - '0';
+                    self.mols.top().coef *= 10;
+                    self.mols.top().coef += c - '0';
                 },
                 'lower': -2,
                 'digit': 7,
                 'upper': 1,
-                '+': -5
+                '+': -5,
+                '(': 9,
+                ')': -8
             }, // non-first digit in number before molecule
 
             8: {
                 call: (c) => {
-                    self.mol.add(self.comp);
-                    self.comp = new Homonuclear(c);
+                    self.mols.top().add(self.comp);
+                    self.comp = new MoleculePart(c);
                 },
 
                 'lower': 2,
                 'upper': 8,
                 'digit': 3,
-                '+': 5
+                '+': 5,
+                '(': 10,
+                ')': 11
             }, // first letter of non-first element
+
+            9: {
+                call: (c) => {
+                    self.mols.push(new Molecule());
+                },
+                'upper': 1,
+                'digit': 6,
+                'lower': -2,
+                '+': -4,
+                '(': 9,
+                ')': -8
+            }, // opening bracket first in molecule
+            10: {
+                call: (c) => {
+                    self.mols.top().add(self.comp);
+                    self.comp = new MoleculePart(c);
+                    self.mols.push(new Molecule());
+                },
+                'upper': 1,
+                'digit': 6,
+                'lower': -2,
+                '+': -4,
+                '(': 9,
+                ')': -8
+            }, // opening bracket non-first in molecule
+            11: {
+                call: (c) => {
+                    if (self.mols.length == 1) {
+                        return -6;
+                    }
+                    self.mols.top().add(self.comp);
+                    self.comp = new MoleculePart(self.mols.top());
+                    self.mols.pop();
+                },
+                'upper': 8,
+                'lower': -2,
+                'digit': 3,
+                '+': 5,
+                '(': 10,
+                ')': 11
+            } // closing bracket
         };
 
     }
@@ -353,12 +432,10 @@ class Parser {
             idx++;
             if (c == ' ') { continue; }
             let next = get_next(this.automata[state], c);
-            console.log('next', next);
             if (next < 0) {
                 return new ParsingError(idx, next);
             }
             state = next;
-            console.log('current state:', state, ' | with char', c);
             let ret = this.automata[state].call(c)
             if (ret < 0) {
                 return new ParsingError(idx, ret);
@@ -389,4 +466,4 @@ function balanceEquation(left, right) {
     for (let mol of left.mols.concat(right.mols)) {
         mol.coef = sol[idx++];
     }
-}                       
+}
