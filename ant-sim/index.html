@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="favicon.png" rel="icon" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <title>Ants Sim</title>
+</head>
+
+<body>
+    <img id="background" src="ants-background.jpg">
+    <h1 class="box">How Ants Locate Food - Simulation (9th grade science project)</h1>
+    <h2 class="box">(Heavily) Inspired by Sebastian Lague's awesome <a
+            href="https://www.youtube.com/watch?v=X-iSQQgOd1A">video</a>
+    </h2>
+    <canvas id="screen"></canvas>
+
+
+    <div id="control-panel">
+        <div id="settings" class="box">
+            <input type="checkbox" onchange="displaySettings.SHOW_HOME_PHEROMONES = this.checked;" checked> Show home
+            pheromones<br>
+            <input type="checkbox" onchange="displaySettings.SHOW_FOOD_PHEROMONES = this.checked;" checked> Show food
+            pheromones<br>
+            <input type="checkbox" onchange="displaySettings.SHOW_COLONY_SENSOR = this.checked;"> Show colony
+            sensor range<br>
+            <input type="checkbox" onchange="displaySettings.SHOW_FOOD_SENSOR = this.checked;"> Show food
+            sensor range<br>
+            <input id="number-of-ants" type="number" min="1" max="200" value="100">
+            <input type="submit" value="Set number of ants"
+                onclick="clearInterval(simInterval);initSimulation();simInterval=startSimulation(document.getElementById('number-of-ants').value)">
+        </div>
+        <div id="brush-picker">
+            <p class="box">Toggle Food Brush</p>
+            <div id="brushes" onclick="toggleFoodBrush();">
+                <img id="brush-spray" src="brush-spray.png">
+                <img id="brush-point" src="brush-point.png">
+            </div>
+        </div>
+    </div>
+    <h3 class="box">
+        Note: Hold your mouse down when using the spray food brush, perform single clicks when using the point brush.
+    </h3>
+    <h3 class="box">
+        I also made two more versions of this simulation: one where the ants just walk randomly (though they
+        have a better food-detection range) and one where some of the ants follow pheromones while the other ants follow
+        those.
+        <br>But these other versions are pretty boring, and I don't want to waste time cleaning the horrible code I
+        wrote for them, so I probably won't add them.
+    </h3>
+
+
+    <script src="linked-list.js"></script>
+    <script src="graphics.js"></script>
+    <script src="settings.js"></script>
+    <script src="simulation.js"></script>
+</body>
+
+</html>

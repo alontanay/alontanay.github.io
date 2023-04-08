@@ -1,0 +1,104 @@
+#background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    content: url("ants-background.jpg");
+    opacity: 0.4;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.box {
+    background-color: white;
+    border: 5px solid black;
+    width: fit-content;
+    margin: auto;
+}
+
+h1,
+h2 {
+    text-align: center;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+h2.box {
+    margin-bottom: 10px;
+    border-top: none;
+}
+
+h3.box {
+    background-color: lightblue;
+    font-weight: normal;
+    width: 80%;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+#screen {
+    background-color: #977d60;
+    border: 5px solid black;
+    margin: auto;
+    display: block;
+    cursor: pointer;
+}
+
+#control-panel {
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    width: fit-content;
+}
+
+#settings {
+    font-size: large;
+    font-weight: bold;
+    padding: 10px;
+}
+
+#brush-picker {
+    margin-left: 20px;
+}
+
+#brush-picker>p {
+    padding: 10px;
+    margin-top: 10px;
+}
+
+input[type=number],
+input[type=submit] {
+    border: 3px solid gray;
+    border-radius: 5px;
+    font-size: large;
+    font-weight: bold;
+}
+
+input[type=number] {
+    width: 50px;
+}
+
+#brushes {
+    position: relative;
+    margin: auto;
+    margin-top: 5px;
+    background-color: white;
+    width: 64px;
+    height: 64px;
+    border: 5px solid black;
+    border-radius: 25%;
+}
+
+#brushes>img {
+    border-radius: 25%;
+    position:absolute;
+    top:0px;
+    left:0px;
+    width:100%;
+    height:100%;
+}
+
+#brushes>img:hover {
+    opacity: 0.7;
+}

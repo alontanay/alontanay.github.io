@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="style.css" rel="stylesheet">
     <title>Sierpinski</title>
 </head>
+
 <body>
-    <p style="position:absolute;top:3px;left:3px;">Hint: zoom out</p>
-    <canvas id="canvas"></canvas>
+    <h1><s>Infinite</s> Sierpinski's Triangle</h1>
+    <span id="correction">Until we hit the recursion stack limit, whatever it may be...</span>
+    <p>Hold + / - (buttons or keyboard) to zoom in / out respectively; drag to move</p>
+    <div id="display">
+        <canvas id="canvas"></canvas>
+        <button onmousedown="keyDown({key:'-'})" onblur="keyUp({key:'-'})">-</button>
+        <button onmousedown="keyDown({key:'+'})" onblur="keyUp({key:'+'})">+</button>
+    </div>
     <script src="main.js"></script>
 </body>
+
 </html>
