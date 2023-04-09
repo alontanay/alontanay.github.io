@@ -1,4 +1,4 @@
-const ZOOM_TICK_MSS = 1;
+const ZOOM_TICK_MSS = 20;
 const SINGLE_ZOOM_DELAY = 500;
 const ZOOM_SPEED = 1.048;
 
@@ -17,24 +17,13 @@ screen.lineWidth = 0.1;
 
 
 // View ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-let initViewHeight = Math.max(2.0, 1.4 * canvas.height / canvas.width);
-let initViewWidth = initViewHeight * canvas.width / canvas.height;
 let view = {
-    left: 0,
-    top: 1 / 4,
-    width: 0,
-    height: 0
+    left: -1,
+    top: -1.25,
+    width: 2,
+    height: 2
 };
-function resizeViewCentered(width, height) {
-    view.left += view.width / 2 - width / 2;
-    view.top += view.height / 2 - height / 2;
-    view.width = width;
-    view.height = height;
-}
-resizeViewCentered(initViewWidth, initViewHeight);
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-window.onresize = () => {
+function resizeCanvas() {
     let coefWidth = canvas.width;
     let coefHeight = canvas.height;
     canvas.height = document.documentElement.scrollHeight - 150;
@@ -43,16 +32,28 @@ window.onresize = () => {
     coefHeight /= canvas.height;
     displayDiv.style.width = `${canvas.getBoundingClientRect().width}px`;
     displayDiv.style.height = `${canvas.getBoundingClientRect().height}px`;
-
-    // let newViewHeight = Math.max(view.height / coefHeight, view.width * coefHeight * canvas.height / canvas.width * coefWidth);
-    // let newViewWidth = newViewHeight * canvas.width / canvas.height;
-    // resizeViewCentered(newViewWidth,newViewHeight);
-    // clearScreen();
-    // drawSierpinski();
-    // view.width = newViewWidth;
-    // view.height = newViewHeight;
+    let relSize = Math.max(view.width / canvas.width, view.height / canvas.height);
+    resizeViewCentered(relSize * canvas.width, relSize * canvas.height);
+    drawSierpinski();
+    // let initViewHeight = Math.max(2.0, 1.4 * canvas.height / canvas.width);
+    // let initViewWidth = initViewHeight * canvas.width / canvas.height;
+    // let view = {
+    //     left: 0,
+    //     top: 1 / 4,
+    //     width: 0,
+    //     height: 0
+    // };
 }
-window.onresize();
+resizeCanvas();
+
+function resizeViewCentered(width, height) {
+    view.left += view.width / 2 - width / 2;
+    view.top += view.height / 2 - height / 2;
+    view.width = width;
+    view.height = height;
+}
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+window.onresize = resizeCanvas;
 
 function crossProduct(vec1, vec2) {
     return vec1.y * vec2.x - vec1.x * vec2.y;
@@ -105,10 +106,10 @@ function drawSierpinskiRec(center = { x: 0, y: 0 }, radius = 1.0) {
 
 function drawSierpinski() {
     clearScreen();
-    drawSierpinskiRec({x:0,y:0},1);
+    drawSierpinskiRec({ x: 0, y: 0 }, 1);
 }
 
-window.requestAnimationFrame(drawSierpinski);
+// window.requestAnimationFrame(drawSierpinski);
 
 function drawView() {
 
@@ -146,36 +147,38 @@ function drawView() {
 
 let zoomCoef;
 let smoothZoomTimeout;
-let zoomAnimation;
+let zoomInterval;
 let zoomStart;
-function zoomTick(timeNow) {
-    if (zoomStart) {
-        if (timeNow - zoomStart < SINGLE_ZOOM_DELAY) {
-            return;
-        }
-    } else {
-        zoomStart = timeNow;
-        return;
-    }
-    let newWidth = view.width * zoomCoef;
-    let newHeight = view.height * zoomCoef;
-    view.left += view.width / 2 - newWidth / 2;
-    view.top += view.height / 2 - newHeight / 2;
-    view.width = newWidth;
-    view.height = newHeight;
+let lastTime;
+function zoomTick() {
+    let timeNow = performance.now();
+    let curZoomCoef = lastTime ? zoomCoef ** ((timeNow-lastTime) / ZOOM_TICK_MSS) : zoomCoef;
+    lastTime = timeNow;
+    resizeViewCentered(view.width*curZoomCoef,view.height*curZoomCoef);
+    // let newWidth = view.width * curZoomCoef;
+    // let newHeight = view.height * curZoomCoef;
+    // view.left += view.width / 2 - newWidth / 2;
+    // view.top += view.height / 2 - newHeight / 2;
+    // view.width = newWidth;
+    // view.height = newHeight;
     clearScreen();
     drawSierpinski();
 }
 function startZoom(zoomIn) {
     console.log('start');
     zoomCoef = zoomIn ? 1 / ZOOM_SPEED : ZOOM_SPEED;
+    lastTime = undefined;
     zoomTick();
-    zoomAnimation = window.requestAnimationFrame(zoomTick);
+    smoothZoomTimeout = setTimeout(() => {
+        lastTime = undefined;
+        zoomInterval = setInterval(zoomTick, ZOOM_TICK_MSS);
+    }, SINGLE_ZOOM_DELAY
+    );
 }
 function stopZoom() {
     console.log('stop');
     clearTimeout(smoothZoomTimeout);
-    window.cancelAnimationFrame(zoomAnimation);
+    clearInterval(zoomInterval);
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -189,7 +192,6 @@ function mouseMove(event) {
     if (dragging) {
         view.left -= (newMousePos[0] - mousePos[0]) * view.width / canvasBound.width;
         view.top -= (newMousePos[1] - mousePos[1]) * view.height / canvasBound.height;
-        console.log(view);
         clearScreen();
         drawSierpinski();
     }
@@ -197,6 +199,9 @@ function mouseMove(event) {
 }
 
 function mouseDown() {
+    if(mousePos[0] < 0 || mousePos[0] > canvas.width || mousePos[1] < 0 || mousePos[1] > canvas.height) {
+        return;
+    }
     dragging = true;
     canvas.style.cursor = 'grabbing';
 }
@@ -205,24 +210,26 @@ function mouseUp() {
     canvas.style.cursor = 'grab';
 }
 
-canvas.addEventListener('mousemove', mouseMove);
-canvas.addEventListener('mousedown', mouseDown);
+document.body.addEventListener('mousemove', mouseMove);
+document.body.addEventListener('mousedown', mouseDown);
 document.body.addEventListener('mouseup', mouseUp);
 
 function keyUp(event) {
     if (!['-', '+', '=', '_'].includes(event.key)) { return; }
     if ((zoomCoef < 1) ^ (event.key == '-')) {
+        console.log('hi');
         stopZoom();
     }
 
 }
 
 function keyDown(event) {
+    if (event.repeat) { return; }
     if (!['-', '+', '=', '_'].includes(event.key)) { return; }
     stopZoom();
     startZoom(event.key == '+' || event.key == '=');
 }
-
-document.body.addEventListener('mouseup', stopZoom);
+let zoomedViaButton = false;
+document.body.addEventListener('mouseup', () => { if (zoomedViaButton) stopZoom(); });
 document.body.addEventListener('keydown', keyDown);
 document.body.addEventListener('keyup', keyUp)

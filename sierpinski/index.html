@@ -15,8 +15,8 @@
     <p>Hold + / - (buttons or keyboard) to zoom in / out respectively; drag to move</p>
     <div id="display">
         <canvas id="canvas"></canvas>
-        <button onmousedown="keyDown({key:'-'})" onblur="keyUp({key:'-'})">-</button>
-        <button onmousedown="keyDown({key:'+'})" onblur="keyUp({key:'+'})">+</button>
+        <button onmousedown="zoomedViaButton = true; keyDown({key:'-'});">-</button>
+        <button onmousedown="zoomedViaButton = true; keyDown({key:'+'});">+</button>
     </div>
     <script src="main.js"></script>
 </body>

@@ -32,7 +32,7 @@ h1 {
 
 
 #canvas {
-    height: calc(100vh - 150px);
+    /* height: calc(100vh - 150px); */
     margin: auto;
     display: block;
     border: 5px solid black;
